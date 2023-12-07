@@ -40,17 +40,16 @@ class Filesystem:
 	    path_components = path.split('/')
 
 	    if path_components[0] == '.':
-	        relative_location = '/'.join(path.split('.')[1:])
-	        return self.pwd if not relative_location else relative_location
+	        return self.pwd if not path_components[1:] else '/'.join(path_components[1:])
 	    elif path_components[0] == '..':
-        	parent_path = '/'.join(self.pwd.split('/')[:-1])
-        	final_location = path.split('..')[-1]
-        	relative_location = '/'.join([parent_path, final_location])
-        	return relative_location
+	        parent_path = '/'.join(self.pwd.split('/')[:-1])
+	        final_location = '/'.join(path_components[1:])
+	        return '/'.join([parent_path, final_location])
 	    elif path_components[0] == '~':
-	        return ROOT if len(path_components) == 1 else path.split('~/')[-1]
+	        return ROOT if len(path_components) == 1 else '/'.join(path_components[1:])
 	    else:
-	        return self.pwd + '/' + path
+	        return	self.pwd + '/' + path
+
 
 	def pwd(self):
 		return self.pwd
