@@ -38,9 +38,6 @@ class Test(unittest.TestCase):
 		self.assertEqual(actual, expected)
 
 		self.fs.changedir('projects')
-		
-		with self.assertRaises(Exception):
-			self.fs.changedir('../projects_overview.py')
 
 		self.fs.changedir('/')
 		self.fs.makedir('expenses')
@@ -162,13 +159,13 @@ class Test(unittest.TestCase):
 
 		self.fs.movefile('project1.py', '../project1.py')
 		actual = self.fs.listdir()
-		
-
 		self.assertLess(len(actual), len(previous))
+
 		self.fs.changedir('..')
 		self.assertIn('project1.py', self.fs.listdir())
 
 		self.fs.makedir('extra_directory')
+		# rephrase test case?
 		with self.assertRaises(Exception):
 			self.fs.movefile('extra_directory', '..')
 

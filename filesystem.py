@@ -34,33 +34,23 @@ class Filesystem:
 			return self.mem_fs.opendir(self.pwd)
 
 	def process_path(self, path):
-		if path == ROOT:
-			return ROOT
+	    if path == ROOT:
+	        return ROOT
 
-		path_components = path.split('/')
-		# if len(path_components) == 1:
-		# 	return '/' + path
-		if path_components[0] == '.':
-			return self.pwd
-		elif path_components[0] == '..':
-			# return parent directory
-			parent_path = self.pwd.split('/')[-2]
+	    path_components = path.split('/')
 
-			if parent_path == '':
-				if path.split('..')[1:] == ['']:
-					return ROOT
-				else:
-					return ('/').join(path.split('..')[1:])
-			else:
-				return ('/').join(self.pwd.split('/')[:-1])
-		elif path_components[0] == '~':
-			if len(path_components) == 1:
-				return ROOT
-			else:
-				return ('/').join(path_components[1:])
-		else:
-			return self.pwd + '/' + path
-
+	    if path_components[0] == '.':
+	        relative_location = '/'.join(path.split('.')[1:])
+	        return self.pwd if not relative_location else relative_location
+	    elif path_components[0] == '..':
+        	parent_path = '/'.join(self.pwd.split('/')[:-1])
+        	final_location = path.split('..')[-1]
+        	relative_location = '/'.join([parent_path, final_location])
+        	return relative_location
+	    elif path_components[0] == '~':
+	        return ROOT if len(path_components) == 1 else path.split('~/')[-1]
+	    else:
+	        return self.pwd + '/' + path
 
 	def pwd(self):
 		return self.pwd
@@ -85,7 +75,7 @@ class Filesystem:
 	def movefile(self, srcpath, dstpath):
 		filename = dstpath.split('/')[-1]
 		abs_srcpath = self.process_path(srcpath)
-		abs_dstpath = self.process_path(dstpath) + '/' + filename
+		abs_dstpath = self.process_path(dstpath)
 		contents = self.mem_fs.readtext(abs_srcpath)
 		self.mem_fs.appendtext(abs_dstpath , contents)
 		self.mem_fs.remove(abs_srcpath)
