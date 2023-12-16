@@ -1,9 +1,5 @@
 # Filesystem
 
-**Filesystem Extension for PyFilesystem**
-
-The `Filesystem` class serves as an extension of PyFilesystem's in-memory filesystem, specifically utilizing the MemoryFS module (accessible [here](https://www.pyfilesystem.org/page/memoryfs/)). This extension enhances the capabilities of PyFilesystem's in-memory filesystem by providing methods for efficient management of directories and files within the virtual filesystem. Leveraging the abstraction offered by FS objects, this extension allows developers to write code that remains agnostic to the physical location of files. For instance, a function designed to search for duplicate files in a directory will seamlessly operate on a variety of storage locations, including the local hard drive, zip files, FTP servers, or Amazon S3. This versatility demonstrates the power and flexibility of PyFilesystem's Filesystem extension in enabling consistent and adaptable file management across diverse storage environments.
-
 ## Table of Contents
 
 - [Getting Started](#getting-started)
@@ -31,6 +27,7 @@ To use the `Filesystem` class, follow these steps:
     ```
 
     This initializes the filesystem with a root directory (`/`) and sets the current working directory (`pwd`) to the root.
+4. Run tests on the `Filesystem` class by calling `python3 -m unittest test_filesystem.py`
 
 ## Filesystem Operations
 
@@ -68,16 +65,10 @@ To use the `Filesystem` class, follow these steps:
 
 ### Working with Files
 
-- **Create an empty file:**
+- **Create an file or append text to an existing file:**
 
     ```python
-    fs.touch("new_file.txt")
-    ```
-
-- **Append text to a file:**
-
-    ```python
-    fs.appendtext("existing_file.txt", "additional text")
+    fs.touch("new_filename.txt", content="")
     ```
 
 - **Read the content of a file:**
@@ -112,28 +103,14 @@ To use the `Filesystem` class, follow these steps:
     current_directory = fs.pwd()
     ```
 
-- **List the directory tree:**
-
-    ```python
-    tree_structure = fs.tree()
-    ```
-
 - **Find files matching a pattern:**
 
     ```python
     matched_files = fs.find("*.txt")
     ```
 
-- **Close the filesystem:**
-
-    ```python
-    fs.close()
-    ```
-
 ## Note
 
 - The filesystem uses a simplified path processing logic to handle operations on paths.
-
-- Ensure to call the `close` method when done with the filesystem to clean up resources.
 
 Feel free to explore and customize the `Filesystem` class based on your specific use case!

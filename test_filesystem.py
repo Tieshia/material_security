@@ -1,16 +1,12 @@
 import unittest
-from filesystem import Filesystem
+from filesytem import Filesystem
 
 class Test(unittest.TestCase):
 	def setUp(self):
 		self.fs = Filesystem()
 
-	def tearDown(self):
-		self.fs.close()
-
 	def test_change_dir_with_basic_path_operations(self):
 		self.fs.touch('projects_overview.py')
-
 		self.fs.changedir('~')
 		actual = self.fs.pwd
 		expected = '/'
@@ -59,7 +55,11 @@ class Test(unittest.TestCase):
 		self.assertEqual(expected, actual)
 
 		self.fs.makedir('projects')
-		self.fs.touch('projects_script.py')
+		actual = self.fs.listdir()
+		expected = ['projects']
+		self.assertEqual(actual, expected)
+
+		self.fs.touch('projects_script.py', 'Runs projects.')
 		actual = self.fs.listdir()
 		expected = ['projects', 'projects_script.py']
 		self.assertListEqual(actual, expected)
@@ -80,6 +80,16 @@ class Test(unittest.TestCase):
 		previous = self.fs.listdir()
 
 		self.fs.removedir('projects')
+		actual = self.fs.listdir()
+		self.assertLess(len(actual), len(previous))
+		self.assertNotEqual(actual, previous)
+
+		self.fs.makedir('projects')
+		self.fs.changedir('projects')
+		self.fs.makedir('project1')
+		previous = self.fs.listdir()
+
+		self.fs.removedir('project1')
 		actual = self.fs.listdir()
 		self.assertLess(len(actual), len(previous))
 		self.assertNotEqual(actual, previous)
@@ -108,22 +118,22 @@ class Test(unittest.TestCase):
 		self.assertNotEqual(previous, actual)
 		self.assertIn('projects.py', actual)
 
-	def test_appendtext_writes_text_to_file(self):
+	def test_touch_writes_text_to_file(self):
 		self.fs.touch('project1.py')
 		previous = self.fs.readtext('project1.py')
-		self.fs.appendtext('project1.py', 'Hello world!')
+		self.fs.touch('project1.py', 'Hello world!')
 		actual = self.fs.readtext('project1.py')
 		self.assertNotEqual(actual, previous)
 		self.assertEqual(actual, 'Hello world!')
 
 		previous = self.fs.listdir()
-		self.fs.appendtext('new_file.py', 'Hello world!')
+		self.fs.touch('new_file.py', 'Hello world!')
 		actual = self.fs.listdir()
 		self.assertGreater(len(actual), len(previous))
 		self.assertEqual(self.fs.readtext('new_file.py'), 'Hello world!')
 
 	def test_read_text_returns_specified_file_contents(self):
-		self.fs.appendtext('project1.py', 'Hello world!')
+		self.fs.touch('project1.py', 'Hello world!')
 		actual = self.fs.readtext('project1.py')
 		expected = 'Hello world!'
 		self.assertEqual(actual, expected)
@@ -134,7 +144,7 @@ class Test(unittest.TestCase):
 	def test_movedir_moves_specified_directory_to_correct_destination(self):
 		self.fs.makedir('projects')
 		self.fs.makedir('projects/project1')
-		self.fs.changedir('projects/')
+		self.fs.changedir('projects')
 		previous = self.fs.listdir()
 
 		self.fs.movedir('project1', '../project1')
@@ -154,14 +164,14 @@ class Test(unittest.TestCase):
 		self.fs.changedir('projects')
 		self.fs.makedir('project1')
 		self.fs.changedir('project1')
-		self.fs.appendtext('project1.py', 'Hello world!')
+		self.fs.touch('project1.py', 'Hello world!')
 		previous = self.fs.listdir()
 
 		self.fs.movefile('project1.py', '../project1.py')
 		actual = self.fs.listdir()
 		self.assertLess(len(actual), len(previous))
-
 		self.fs.changedir('..')
+		actual = self.fs.listdir()
 		self.assertIn('project1.py', self.fs.listdir())
 
 		self.fs.makedir('extra_directory')
@@ -171,8 +181,8 @@ class Test(unittest.TestCase):
 
 	def test_find_returns_files_and_directories_matching_specified_parameters(self):
 		self.fs.makedir('projects')
-		self.fs.appendtext('project1.py', 'Hello world.')
-		self.fs.appendtext('unrelated.py', 'Hello world.')
+		self.fs.touch('project1.py', 'Hello world.')
+		self.fs.touch('unrelated.py', 'Hello world.')
 		actual = self.fs.find('project1')
 		expected = ['project1.py']
 		self.assertEqual(actual, expected)
@@ -181,7 +191,7 @@ class Test(unittest.TestCase):
 		expected = []
 		self.assertEqual(actual, expected)
 
-	def test_remove_removes_specified_file(self):
+	def test_removefile_removes_specified_file(self):
 		self.fs.touch('project1.py')
 		previous = self.fs.listdir()
 
@@ -197,7 +207,7 @@ class Test(unittest.TestCase):
 
 	def test_copyfile_copies_file_into_specified_directory(self):
 		self.fs.makedir('projects')
-		self.fs.appendtext('project1.py', 'Hello world!')
+		self.fs.touch('project1.py', 'Hello world!')
 		self.fs.copyfile('project1.py', 'projects/project1.py')
 
 		self.fs.changedir('projects')
@@ -213,7 +223,7 @@ class Test(unittest.TestCase):
 		self.fs.makedir('projects')
 		self.fs.makedir('project1')
 		self.fs.changedir('project1')
-		self.fs.appendtext('project1.py', 'Hellow world!')
+		self.fs.touch('project1.py', 'Hello world!')
 		self.fs.changedir('..')
 		self.fs.copydir('project1', 'projects')
 
@@ -228,4 +238,5 @@ class Test(unittest.TestCase):
 		self.assertIn('project1', actual)
 
 
-unittest.main(verbosity=2)	
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
